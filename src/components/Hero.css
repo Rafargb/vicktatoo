@@ -9,12 +9,6 @@
   background-position: center;
 }
 
-@media (max-width: 767px) {
-  .hero-section {
-    min-height: 100vw;
-  }
-}
-
 .hero-section::before {
   content: '';
   position: absolute;
