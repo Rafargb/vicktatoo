@@ -4,9 +4,15 @@
   flex-direction: column;
   padding-top: var(--spacing-md);
   position: relative;
-  background-image: url('/hero-upscaled.jpg');
+  background-image: var(--desktop-bg, url('/hero-upscaled.jpg'));
   background-size: cover;
   background-position: center;
+}
+
+@media (max-width: 767px) {
+  .hero-section {
+    background-image: var(--mobile-bg, url('/hero-upscaled.jpg'));
+  }
 }
 
 .hero-section::before {

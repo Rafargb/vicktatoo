@@ -1,20 +1,36 @@
-import React from 'react';
-import { useLanguage } from '../LanguageContext';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../supabase';
 import './Hero.css';
 
 const Hero = () => {
-  const { t } = useLanguage();
+  const [heroSettings, setHeroSettings] = useState({
+    logoText: 'VIKTORIA • TATTOO PHUKET',
+    desktopImage: '/hero-upscaled.jpg',
+    mobileImage: '/hero-upscaled.jpg'
+  });
 
-  const scrollToForm = () => {
-    document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth' });
-  };
+  useEffect(() => {
+    const fetchHeroSettings = async () => {
+      const { data } = await supabase.from('site_content').select('data').eq('id', 'hero_settings').single();
+      if (data && data.data) {
+        setHeroSettings(data.data);
+      }
+    };
+    fetchHeroSettings();
+  }, []);
 
   return (
     <>
-      <header className="hero-section">
+      <header 
+        className="hero-section"
+        style={{ 
+          '--desktop-bg': `url(${heroSettings.desktopImage})`,
+          '--mobile-bg': `url(${heroSettings.mobileImage})`
+        }}
+      >
         <div className="container hero-container">
           <nav className="hero-nav fade-in">
-            <span className="logo text-sans">VIKTORIA • TATTOO PHUKET</span>
+            <span className="logo text-sans">{heroSettings.logoText}</span>
           </nav>
         </div>
         

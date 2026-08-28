@@ -43,11 +43,65 @@ const AdminDashboard = ({ session, onLogout }) => {
   // New gallery state
   const [newGalleryName, setNewGalleryName] = useState('');
 
+  const [heroSettings, setHeroSettings] = useState({ logoText: '', desktopImage: '', mobileImage: '' });
+  const [loadingHeroUpload, setLoadingHeroUpload] = useState(false);
+
   useEffect(() => {
     checkContent();
     fetchMessages();
     fetchPortfolio();
+    fetchHeroSettings();
   }, []);
+
+  const fetchHeroSettings = async () => {
+    const { data } = await supabase.from('site_content').select('data').eq('id', 'hero_settings').single();
+    if (data) {
+      setHeroSettings(data.data);
+    } else {
+      // Initialize silently
+      const defaultHero = {
+        logoText: 'VIKTORIA • TATTOO PHUKET',
+        desktopImage: '/hero-upscaled.jpg',
+        mobileImage: '/hero-upscaled.jpg'
+      };
+      await supabase.from('site_content').upsert({ id: 'hero_settings', data: defaultHero });
+      setHeroSettings(defaultHero);
+    }
+  };
+
+  const handleHeroUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setLoadingHeroUpload(true);
+    try {
+      const fileName = `${Date.now()}_${file.name}`;
+      const { error } = await supabase.storage.from('portfolio').upload(fileName, file);
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabase.storage.from('portfolio').getPublicUrl(fileName);
+      
+      const updatedSettings = { ...heroSettings, [type]: publicUrl };
+      const { error: updateError } = await supabase.from('site_content').update({ data: updatedSettings }).eq('id', 'hero_settings');
+      if (updateError) throw updateError;
+      
+      setHeroSettings(updatedSettings);
+      alert('Capa atualizada com sucesso!');
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao fazer upload da capa.');
+    } finally {
+      setLoadingHeroUpload(false);
+    }
+  };
+
+  const handleSaveHeroText = async () => {
+    const { error } = await supabase.from('site_content').update({ data: heroSettings }).eq('id', 'hero_settings');
+    if (error) {
+      alert('Erro ao salvar texto da capa.');
+    } else {
+      alert('Texto da capa salvo!');
+    }
+  };
 
   const fetchPortfolio = async () => {
     const { data } = await supabase.from('site_content').select('data').eq('id', 'portfolio').single();
@@ -70,7 +124,6 @@ const AdminDashboard = ({ session, onLogout }) => {
       
       const updatedPortfolio = portfolio.map(cat => {
         if (cat.id === selectedCategory) {
-          // Se for a primeira foto da galeria, defina como capa também (image)
           const newImage = cat.gallery.length === 0 ? publicUrl : cat.image;
           return { ...cat, image: newImage, gallery: [...cat.gallery, publicUrl] };
         }
@@ -114,7 +167,7 @@ const AdminDashboard = ({ session, onLogout }) => {
     const newId = newGalleryName.toLowerCase().replace(/[^a-z0-9]/g, '-');
     const newCat = {
       id: newId,
-      titleKey: newGalleryName, // Since it won't match a translation key, the translator will just output this string!
+      titleKey: newGalleryName,
       subtitleKey: '',
       image: '',
       gallery: []
@@ -142,6 +195,12 @@ const AdminDashboard = ({ session, onLogout }) => {
     setSeeding(true);
     await supabase.from('site_content').upsert({ id: 'translations', data: defaultTranslations });
     await supabase.from('site_content').upsert({ id: 'portfolio', data: fallbackCategories });
+    const defaultHero = {
+      logoText: 'VIKTORIA • TATTOO PHUKET',
+      desktopImage: '/hero-upscaled.jpg',
+      mobileImage: '/hero-upscaled.jpg'
+    };
+    await supabase.from('site_content').upsert({ id: 'hero_settings', data: defaultHero });
     setNeedsSeed(false);
     setSeeding(false);
     alert('Banco de dados inicializado com sucesso!');
@@ -177,6 +236,7 @@ const AdminDashboard = ({ session, onLogout }) => {
 
       <div className="admin-tabs">
         <button className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>Mensagens</button>
+        <button className={activeTab === 'hero' ? 'active' : ''} onClick={() => setActiveTab('hero')}>Capa do Site</button>
         <button className={activeTab === 'texts' ? 'active' : ''} onClick={() => setActiveTab('texts')}>Textos do Site</button>
         <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Portfólio</button>
       </div>
@@ -196,6 +256,45 @@ const AdminDashboard = ({ session, onLogout }) => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'hero' && (
+          <div>
+            <h3>Gerenciar Capa do Site</h3>
+            
+            <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
+              <h4>Texto do Logo (Topo)</h4>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <input 
+                  type="text" 
+                  value={heroSettings.logoText}
+                  onChange={(e) => setHeroSettings({...heroSettings, logoText: e.target.value})}
+                  style={{ padding: '0.5rem', fontSize: '1rem', flex: 1 }}
+                />
+                <button onClick={handleSaveHeroText} className="btn btn-primary">Salvar Texto</button>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
+              <h4>Imagem de Fundo - Computador</h4>
+              <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Recomendado: Imagem horizontal (paisagem).</p>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                {heroSettings.desktopImage && <img src={heroSettings.desktopImage} alt="Desktop" style={{ width: '150px', height: '100px', objectFit: 'cover', borderRadius: '4px' }} />}
+                <input type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, 'desktopImage')} disabled={loadingHeroUpload} />
+                {loadingHeroUpload && <span>Fazendo upload...</span>}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
+              <h4>Imagem de Fundo - Celular</h4>
+              <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Recomendado: Imagem vertical (formato Stories, 9:16).</p>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                {heroSettings.mobileImage && <img src={heroSettings.mobileImage} alt="Mobile" style={{ width: '100px', height: '150px', objectFit: 'cover', borderRadius: '4px' }} />}
+                <input type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, 'mobileImage')} disabled={loadingHeroUpload} />
+                {loadingHeroUpload && <span>Fazendo upload...</span>}
+              </div>
+            </div>
           </div>
         )}
 
