@@ -52,6 +52,12 @@
   opacity: 0.9;
 }
 
+@media (max-width: 767px) {
+  .hero-nav {
+    padding-top: 5rem;
+  }
+}
+
 .scroll-indicator {
   position: absolute;
   bottom: 2rem;
