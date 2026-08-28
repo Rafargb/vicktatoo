@@ -49,10 +49,10 @@ const TextEditor = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <h3>Editar Textos do Site</h3>
-        <div>
-          <label style={{ marginRight: '1rem' }}>Idioma que deseja editar: </label>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <label>Idioma que deseja editar: </label>
           <select value={lang} onChange={e => setLang(e.target.value)} style={{ padding: '0.5rem' }}>
             <option value="en">Inglês (English)</option>
             <option value="ru">Russo (Русский)</option>
@@ -61,7 +61,7 @@ const TextEditor = () => {
         </div>
       </div>
 
-      <div style={{ background: '#fff', padding: '2rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+      <div style={{ background: '#fff', padding: '1rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
         {Object.keys(sections).map(section => (
           <div key={section} style={{ marginBottom: '2rem' }}>
             <h4 style={{ textTransform: 'capitalize', color: 'var(--color-accent)', marginBottom: '1rem' }}>{section}</h4>
