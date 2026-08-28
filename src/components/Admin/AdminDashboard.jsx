@@ -53,12 +53,25 @@ const AdminDashboard = ({ session, onLogout }) => {
     fetchHeroSettings();
   }, []);
 
+  const deleteFromStorage = async (url) => {
+    // Only attempt to delete if it's a Supabase storage URL
+    if (!url || !url.includes('supabase.co/storage/v1/object/public/portfolio/')) return;
+    try {
+      // Decode URI component to handle spaces/special chars just in case
+      const fileName = decodeURIComponent(url.split('/').pop());
+      if (fileName) {
+        await supabase.storage.from('portfolio').remove([fileName]);
+      }
+    } catch (e) {
+      console.error('Error deleting old image from storage', e);
+    }
+  };
+
   const fetchHeroSettings = async () => {
     const { data } = await supabase.from('site_content').select('data').eq('id', 'hero_settings').single();
     if (data) {
       setHeroSettings(data.data);
     } else {
-      // Initialize silently
       const defaultHero = {
         logoText: 'VIKTORIA • TATTOO PHUKET',
         desktopImage: '/hero-upscaled.jpg',
@@ -74,11 +87,19 @@ const AdminDashboard = ({ session, onLogout }) => {
     if (!file) return;
     setLoadingHeroUpload(true);
     try {
-      const fileName = `${Date.now()}_${file.name}`;
-      const { error } = await supabase.storage.from('portfolio').upload(fileName, file);
+      // Sanitize file name to avoid errors on mobile (accents, spaces, emojis)
+      const ext = file.name.split('.').pop() || 'jpg';
+      const safeName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+      
+      const { error } = await supabase.storage.from('portfolio').upload(safeName, file);
       if (error) throw error;
       
-      const { data: { publicUrl } } = supabase.storage.from('portfolio').getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabase.storage.from('portfolio').getPublicUrl(safeName);
+      
+      // Delete old image from storage if it was in Supabase
+      if (heroSettings[type]) {
+        await deleteFromStorage(heroSettings[type]);
+      }
       
       const updatedSettings = { ...heroSettings, [type]: publicUrl };
       const { error: updateError } = await supabase.from('site_content').update({ data: updatedSettings }).eq('id', 'hero_settings');
@@ -88,7 +109,31 @@ const AdminDashboard = ({ session, onLogout }) => {
       alert('Capa atualizada com sucesso!');
     } catch (error) {
       console.error(error);
-      alert('Erro ao fazer upload da capa.');
+      alert('Erro ao fazer upload da capa. Tente novamente.');
+    } finally {
+      setLoadingHeroUpload(false);
+      // Reset input
+      e.target.value = null;
+    }
+  };
+
+  const handleDeleteHeroImage = async (type) => {
+    if (!window.confirm('Tem certeza que deseja remover esta imagem de capa?')) return;
+    
+    setLoadingHeroUpload(true);
+    try {
+      if (heroSettings[type]) {
+        await deleteFromStorage(heroSettings[type]);
+      }
+      
+      const updatedSettings = { ...heroSettings, [type]: '' };
+      const { error } = await supabase.from('site_content').update({ data: updatedSettings }).eq('id', 'hero_settings');
+      if (error) throw error;
+      
+      setHeroSettings(updatedSettings);
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao remover a imagem.');
     } finally {
       setLoadingHeroUpload(false);
     }
@@ -116,11 +161,13 @@ const AdminDashboard = ({ session, onLogout }) => {
     if (!file) return;
     setLoadingUpload(true);
     try {
-      const fileName = `${Date.now()}_${file.name}`;
-      const { data, error } = await supabase.storage.from('portfolio').upload(fileName, file);
+      const ext = file.name.split('.').pop() || 'jpg';
+      const safeName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+      
+      const { data, error } = await supabase.storage.from('portfolio').upload(safeName, file);
       if (error) throw error;
       
-      const { data: { publicUrl } } = supabase.storage.from('portfolio').getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabase.storage.from('portfolio').getPublicUrl(safeName);
       
       const updatedPortfolio = portfolio.map(cat => {
         if (cat.id === selectedCategory) {
@@ -137,27 +184,33 @@ const AdminDashboard = ({ session, onLogout }) => {
       alert('Foto adicionada com sucesso!');
     } catch (error) {
       console.error(error);
-      alert('Erro ao fazer upload da foto.');
+      alert('Erro ao fazer upload da foto. Tente novamente.');
     } finally {
       setLoadingUpload(false);
+      e.target.value = null;
     }
   };
 
   const handleDeletePhoto = async (catId, photoUrl) => {
-    if (!window.confirm('Tem certeza que deseja remover esta foto da galeria?')) return;
+    if (!window.confirm('Tem certeza que deseja remover esta foto da galeria? Ela será excluída do servidor.')) return;
     
-    const updatedPortfolio = portfolio.map(cat => {
-      if (cat.id === catId) {
-        return { ...cat, gallery: cat.gallery.filter(img => img !== photoUrl) };
-      }
-      return cat;
-    });
+    try {
+      await deleteFromStorage(photoUrl);
+      
+      const updatedPortfolio = portfolio.map(cat => {
+        if (cat.id === catId) {
+          return { ...cat, gallery: cat.gallery.filter(img => img !== photoUrl) };
+        }
+        return cat;
+      });
 
-    const { error } = await supabase.from('site_content').update({ data: updatedPortfolio }).eq('id', 'portfolio');
-    if (error) {
-      alert('Erro ao remover foto.');
-    } else {
+      const { error } = await supabase.from('site_content').update({ data: updatedPortfolio }).eq('id', 'portfolio');
+      if (error) throw error;
+      
       setPortfolio(updatedPortfolio);
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao remover foto do servidor.');
     }
   };
 
@@ -279,20 +332,40 @@ const AdminDashboard = ({ session, onLogout }) => {
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
               <h4>Imagem de Fundo - Computador</h4>
               <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Recomendado: Imagem horizontal (paisagem).</p>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                {heroSettings.desktopImage && <img src={heroSettings.desktopImage} alt="Desktop" style={{ width: '150px', height: '100px', objectFit: 'cover', borderRadius: '4px' }} />}
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                {heroSettings.desktopImage && (
+                  <div style={{ position: 'relative' }}>
+                    <img src={heroSettings.desktopImage} alt="Desktop" style={{ width: '150px', height: '100px', objectFit: 'cover', borderRadius: '4px' }} />
+                    <button 
+                      onClick={() => handleDeleteHeroImage('desktopImage')}
+                      style={{ position: 'absolute', top: -10, right: -10, background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer' }}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
                 <input type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, 'desktopImage')} disabled={loadingHeroUpload} />
-                {loadingHeroUpload && <span>Fazendo upload...</span>}
+                {loadingHeroUpload && <span>Processando...</span>}
               </div>
             </div>
 
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
               <h4>Imagem de Fundo - Celular</h4>
               <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Recomendado: Imagem vertical (formato Stories, 9:16).</p>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                {heroSettings.mobileImage && <img src={heroSettings.mobileImage} alt="Mobile" style={{ width: '100px', height: '150px', objectFit: 'cover', borderRadius: '4px' }} />}
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                {heroSettings.mobileImage && (
+                  <div style={{ position: 'relative' }}>
+                    <img src={heroSettings.mobileImage} alt="Mobile" style={{ width: '100px', height: '150px', objectFit: 'cover', borderRadius: '4px' }} />
+                    <button 
+                      onClick={() => handleDeleteHeroImage('mobileImage')}
+                      style={{ position: 'absolute', top: -10, right: -10, background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer' }}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
                 <input type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, 'mobileImage')} disabled={loadingHeroUpload} />
-                {loadingHeroUpload && <span>Fazendo upload...</span>}
+                {loadingHeroUpload && <span>Processando...</span>}
               </div>
             </div>
           </div>
@@ -322,7 +395,7 @@ const AdminDashboard = ({ session, onLogout }) => {
 
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
               <h4>Adicionar Foto à Galeria Existente</h4>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '1rem' }}>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
                 <select 
                   value={selectedCategory} 
                   onChange={(e) => setSelectedCategory(e.target.value)}
