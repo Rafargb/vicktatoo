@@ -71,6 +71,12 @@
   opacity: 0.8;
 }
 
+@media (max-width: 767px) {
+  .scroll-indicator {
+    bottom: 5rem;
+  }
+}
+
 .mouse-wheel {
   animation: scrollWheel 2s infinite;
 }
