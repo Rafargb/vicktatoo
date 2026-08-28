@@ -21,6 +21,12 @@
   z-index: 0;
 }
 
+@media (max-width: 767px) {
+  .hero-section::before {
+    display: none;
+  }
+}
+
 .hero-container {
   display: flex;
   flex-direction: column;
