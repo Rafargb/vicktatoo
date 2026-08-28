@@ -35,14 +35,14 @@ const TextEditor = () => {
     const { error } = await supabase.from('site_content').update({ data: translations }).eq('id', 'translations');
     setSaving(false);
     if (error) {
-      alert('Erro ao salvar os textos.');
+      alert('Ошибка при сохранении текстов.');
     } else {
-      alert('Textos salvos com sucesso!');
+      alert('Тексты успешно сохранены!');
     }
   };
 
-  if (loading) return <p>Carregando textos...</p>;
-  if (!translations) return <p>Nenhum texto encontrado no banco de dados.</p>;
+  if (loading) return <p>Загрузка текстов...</p>;
+  if (!translations) return <p>Тексты не найдены в базе данных.</p>;
 
   // Get sections from the chosen language
   const sections = translations[lang] || {};
@@ -50,13 +50,13 @@ const TextEditor = () => {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
-        <h3>Editar Textos do Site</h3>
+        <h3>Редактировать тексты сайта</h3>
         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <label>Idioma que deseja editar: </label>
+          <label>Язык для редактирования: </label>
           <select value={lang} onChange={e => setLang(e.target.value)} style={{ padding: '0.5rem' }}>
-            <option value="en">Inglês (English)</option>
-            <option value="ru">Russo (Русский)</option>
-            <option value="th">Tailandês (ไทย)</option>
+            <option value="en">Английский (English)</option>
+            <option value="ru">Русский (Русский)</option>
+            <option value="th">Тайский (ไทย)</option>
           </select>
         </div>
       </div>
@@ -81,7 +81,7 @@ const TextEditor = () => {
         ))}
         
         <button onClick={handleSave} disabled={saving} className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
-          {saving ? 'Salvando...' : 'Salvar Todas as Alterações'}
+          {saving ? 'Сохранение...' : 'Сохранить все изменения'}
         </button>
       </div>
     </div>

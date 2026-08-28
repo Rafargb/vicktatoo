@@ -19,7 +19,7 @@ const AdminLogin = ({ onLogin }) => {
     });
 
     if (error) {
-      setError('Email ou senha incorretos.');
+      setError('Неверный Email или пароль.');
       setLoading(false);
     } else {
       onLogin(data.session);
@@ -29,7 +29,7 @@ const AdminLogin = ({ onLogin }) => {
   return (
     <div className="admin-login-container">
       <form onSubmit={handleLogin} className="admin-login-form">
-        <h2>Acesso Administrativo</h2>
+        <h2>Вход для администратора</h2>
         {error && <div className="admin-error">{error}</div>}
         <div className="form-group">
           <label>Email</label>
@@ -42,7 +42,7 @@ const AdminLogin = ({ onLogin }) => {
           />
         </div>
         <div className="form-group">
-          <label>Senha</label>
+          <label>Пароль</label>
           <input 
             type="password" 
             value={password} 
@@ -52,7 +52,7 @@ const AdminLogin = ({ onLogin }) => {
           />
         </div>
         <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Entrando...' : 'Entrar'}
+          {loading ? 'Вход...' : 'Войти'}
         </button>
       </form>
     </div>

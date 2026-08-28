@@ -87,7 +87,6 @@ const AdminDashboard = ({ session, onLogout }) => {
     if (!file) return;
     setLoadingHeroUpload(true);
     try {
-      // Sanitize file name to avoid errors on mobile (accents, spaces, emojis)
       const ext = file.name.split('.').pop() || 'jpg';
       const safeName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
       
@@ -96,7 +95,6 @@ const AdminDashboard = ({ session, onLogout }) => {
       
       const { data: { publicUrl } } = supabase.storage.from('portfolio').getPublicUrl(safeName);
       
-      // Delete old image from storage if it was in Supabase
       if (heroSettings[type]) {
         await deleteFromStorage(heroSettings[type]);
       }
@@ -106,19 +104,18 @@ const AdminDashboard = ({ session, onLogout }) => {
       if (updateError) throw updateError;
       
       setHeroSettings(updatedSettings);
-      alert('Capa atualizada com sucesso!');
+      alert('Обложка успешно обновлена!');
     } catch (error) {
       console.error(error);
-      alert('Erro ao fazer upload da capa. Tente novamente.');
+      alert('Ошибка загрузки обложки. Попробуйте еще раз.');
     } finally {
       setLoadingHeroUpload(false);
-      // Reset input
       e.target.value = null;
     }
   };
 
   const handleDeleteHeroImage = async (type) => {
-    if (!window.confirm('Tem certeza que deseja remover esta imagem de capa?')) return;
+    if (!window.confirm('Вы уверены, что хотите удалить это изображение обложки?')) return;
     
     setLoadingHeroUpload(true);
     try {
@@ -133,7 +130,7 @@ const AdminDashboard = ({ session, onLogout }) => {
       setHeroSettings(updatedSettings);
     } catch (error) {
       console.error(error);
-      alert('Erro ao remover a imagem.');
+      alert('Ошибка при удалении изображения.');
     } finally {
       setLoadingHeroUpload(false);
     }
@@ -142,9 +139,9 @@ const AdminDashboard = ({ session, onLogout }) => {
   const handleSaveHeroText = async () => {
     const { error } = await supabase.from('site_content').update({ data: heroSettings }).eq('id', 'hero_settings');
     if (error) {
-      alert('Erro ao salvar texto da capa.');
+      alert('Ошибка при сохранении текста обложки.');
     } else {
-      alert('Texto da capa salvo!');
+      alert('Текст обложки сохранен!');
     }
   };
 
@@ -181,10 +178,10 @@ const AdminDashboard = ({ session, onLogout }) => {
       if (updateError) throw updateError;
       
       setPortfolio(updatedPortfolio);
-      alert('Foto adicionada com sucesso!');
+      alert('Фото успешно добавлено!');
     } catch (error) {
       console.error(error);
-      alert('Erro ao fazer upload da foto. Tente novamente.');
+      alert('Ошибка загрузки фото. Попробуйте еще раз.');
     } finally {
       setLoadingUpload(false);
       e.target.value = null;
@@ -192,7 +189,7 @@ const AdminDashboard = ({ session, onLogout }) => {
   };
 
   const handleDeletePhoto = async (catId, photoUrl) => {
-    if (!window.confirm('Tem certeza que deseja remover esta foto da galeria? Ela será excluída do servidor.')) return;
+    if (!window.confirm('Вы уверены, что хотите удалить это фото из галереи? Оно будет удалено с сервера.')) return;
     
     try {
       await deleteFromStorage(photoUrl);
@@ -210,7 +207,7 @@ const AdminDashboard = ({ session, onLogout }) => {
       setPortfolio(updatedPortfolio);
     } catch (error) {
       console.error(error);
-      alert('Erro ao remover foto do servidor.');
+      alert('Ошибка при удалении фото с сервера.');
     }
   };
 
@@ -230,12 +227,12 @@ const AdminDashboard = ({ session, onLogout }) => {
     
     const { error } = await supabase.from('site_content').update({ data: updatedPortfolio }).eq('id', 'portfolio');
     if (error) {
-      alert('Erro ao criar galeria.');
+      alert('Ошибка при создании галереи.');
     } else {
       setPortfolio(updatedPortfolio);
       setNewGalleryName('');
       setSelectedCategory(newId);
-      alert('Galeria criada! Agora adicione fotos nela.');
+      alert('Галерея создана! Теперь добавьте в нее фото.');
     }
   };
 
@@ -256,7 +253,7 @@ const AdminDashboard = ({ session, onLogout }) => {
     await supabase.from('site_content').upsert({ id: 'hero_settings', data: defaultHero });
     setNeedsSeed(false);
     setSeeding(false);
-    alert('Banco de dados inicializado com sucesso!');
+    alert('База данных успешно инициализирована!');
     window.location.reload();
   };
 
@@ -274,37 +271,37 @@ const AdminDashboard = ({ session, onLogout }) => {
   return (
     <div className="admin-dashboard-container">
       <header className="admin-header">
-        <h2>Painel de Controle</h2>
-        <button onClick={handleLogout} className="btn btn-outline">Sair</button>
+        <h2>Панель управления</h2>
+        <button onClick={handleLogout} className="btn btn-outline">Выйти</button>
       </header>
 
       {needsSeed && (
         <div style={{ background: '#ffeb3b', padding: '1rem', textAlign: 'center', color: '#000' }}>
-          <p>O site precisa ser inicializado com os textos base.</p>
+          <p>Сайт должен быть инициализирован с базовыми текстами.</p>
           <button onClick={handleSeed} disabled={seeding} className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
-            {seeding ? 'Carregando...' : 'Inicializar Banco de Dados'}
+            {seeding ? 'Загрузка...' : 'Инициализировать базу данных'}
           </button>
         </div>
       )}
 
       <div className="admin-tabs">
-        <button className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>Mensagens</button>
-        <button className={activeTab === 'hero' ? 'active' : ''} onClick={() => setActiveTab('hero')}>Capa do Site</button>
-        <button className={activeTab === 'texts' ? 'active' : ''} onClick={() => setActiveTab('texts')}>Textos do Site</button>
-        <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Portfólio</button>
+        <button className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>Сообщения</button>
+        <button className={activeTab === 'hero' ? 'active' : ''} onClick={() => setActiveTab('hero')}>Обложка сайта</button>
+        <button className={activeTab === 'texts' ? 'active' : ''} onClick={() => setActiveTab('texts')}>Тексты сайта</button>
+        <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Портфолио</button>
       </div>
 
       <div className="admin-content">
         {activeTab === 'messages' && (
           <div>
-            <h3>Mensagens Recebidas</h3>
-            {loadingMsgs ? <p>Carregando...</p> : messages.length === 0 ? <p>Nenhuma mensagem.</p> : (
+            <h3>Полученные сообщения</h3>
+            {loadingMsgs ? <p>Загрузка...</p> : messages.length === 0 ? <p>Нет сообщений.</p> : (
               <div className="messages-grid">
                 {messages.map(msg => (
                   <div key={msg.id} className="message-card">
-                    <p><strong>Nome:</strong> {msg.name}</p>
-                    <p><strong>Data:</strong> {new Date(msg.created_at).toLocaleString('pt-BR')}</p>
-                    <p className="message-story"><strong>Ideia:</strong> {msg.story}</p>
+                    <p><strong>Имя:</strong> {msg.name}</p>
+                    <p><strong>Дата:</strong> {new Date(msg.created_at).toLocaleString('ru-RU')}</p>
+                    <p className="message-story"><strong>Идея:</strong> {msg.story}</p>
                   </div>
                 ))}
               </div>
@@ -314,10 +311,10 @@ const AdminDashboard = ({ session, onLogout }) => {
 
         {activeTab === 'hero' && (
           <div>
-            <h3>Gerenciar Capa do Site</h3>
+            <h3>Управление обложкой сайта</h3>
             
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
-              <h4>Texto do Logo (Topo)</h4>
+              <h4>Текст логотипа (Вверху)</h4>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <input 
                   type="text" 
@@ -325,13 +322,13 @@ const AdminDashboard = ({ session, onLogout }) => {
                   onChange={(e) => setHeroSettings({...heroSettings, logoText: e.target.value})}
                   style={{ padding: '0.5rem', fontSize: '1rem', flex: 1 }}
                 />
-                <button onClick={handleSaveHeroText} className="btn btn-primary">Salvar Texto</button>
+                <button onClick={handleSaveHeroText} className="btn btn-primary">Сохранить текст</button>
               </div>
             </div>
 
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
-              <h4>Imagem de Fundo - Computador</h4>
-              <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Recomendado: Imagem horizontal (paisagem).</p>
+              <h4>Фоновое изображение - Компьютер</h4>
+              <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Рекомендуется: Горизонтальное изображение (пейзаж).</p>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 {heroSettings.desktopImage && (
                   <div style={{ position: 'relative' }}>
@@ -345,13 +342,13 @@ const AdminDashboard = ({ session, onLogout }) => {
                   </div>
                 )}
                 <input type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, 'desktopImage')} disabled={loadingHeroUpload} />
-                {loadingHeroUpload && <span>Processando...</span>}
+                {loadingHeroUpload && <span>Обработка...</span>}
               </div>
             </div>
 
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
-              <h4>Imagem de Fundo - Celular</h4>
-              <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Recomendado: Imagem vertical (formato Stories, 9:16).</p>
+              <h4>Фоновое изображение - Телефон</h4>
+              <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Рекомендуется: Вертикальное изображение (формат Stories, 9:16).</p>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 {heroSettings.mobileImage && (
                   <div style={{ position: 'relative' }}>
@@ -365,7 +362,7 @@ const AdminDashboard = ({ session, onLogout }) => {
                   </div>
                 )}
                 <input type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, 'mobileImage')} disabled={loadingHeroUpload} />
-                {loadingHeroUpload && <span>Processando...</span>}
+                {loadingHeroUpload && <span>Обработка...</span>}
               </div>
             </div>
           </div>
@@ -377,24 +374,24 @@ const AdminDashboard = ({ session, onLogout }) => {
 
         {activeTab === 'portfolio' && (
           <div>
-            <h3>Gerenciar Portfólio</h3>
+            <h3>Управление портфолио</h3>
             
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
-              <h4>Criar Nova Galeria</h4>
+              <h4>Создать новую галерею</h4>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <input 
                   type="text" 
-                  placeholder="Nome da Categoria (Ex: Fine Line)" 
+                  placeholder="Название категории (Например: Fine Line)" 
                   value={newGalleryName}
                   onChange={(e) => setNewGalleryName(e.target.value)}
                   style={{ padding: '0.5rem', fontSize: '1rem', flex: 1 }}
                 />
-                <button onClick={handleCreateGallery} className="btn btn-primary">Criar Galeria</button>
+                <button onClick={handleCreateGallery} className="btn btn-primary">Создать галерею</button>
               </div>
             </div>
 
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
-              <h4>Adicionar Foto à Galeria Existente</h4>
+              <h4>Добавить фото в существующую галерею</h4>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
                 <select 
                   value={selectedCategory} 
@@ -402,19 +399,19 @@ const AdminDashboard = ({ session, onLogout }) => {
                   style={{ padding: '0.5rem', fontSize: '1rem' }}
                 >
                   {portfolio.map(cat => (
-                    <option key={cat.id} value={cat.id}>Galeria: {cat.titleKey || cat.id}</option>
+                    <option key={cat.id} value={cat.id}>Галерея: {cat.titleKey || cat.id}</option>
                   ))}
                 </select>
                 <input type="file" accept="image/*" onChange={handleUpload} disabled={loadingUpload} />
-                {loadingUpload && <span>Fazendo upload...</span>}
+                {loadingUpload && <span>Загрузка...</span>}
               </div>
             </div>
 
             {portfolio.map(cat => (
               <div key={cat.id} style={{ marginBottom: '3rem' }}>
-                <h4 style={{ textTransform: 'capitalize', marginBottom: '1rem' }}>Galeria: {cat.titleKey || cat.id}</h4>
+                <h4 style={{ textTransform: 'capitalize', marginBottom: '1rem' }}>Галерея: {cat.titleKey || cat.id}</h4>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                  {cat.gallery.length === 0 && <p style={{ fontSize: '0.9rem', color: '#666' }}>Nenhuma foto nesta galeria ainda.</p>}
+                  {cat.gallery.length === 0 && <p style={{ fontSize: '0.9rem', color: '#666' }}>В этой галерее пока нет фото.</p>}
                   {cat.gallery.map((img, idx) => (
                     <div key={idx} style={{ position: 'relative', width: '150px', height: '150px' }}>
                       <img src={img} alt="Galeria" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
