@@ -17,6 +17,9 @@ const HeroInfo = () => {
       <div className="container hero-info-container">
         <div className="hero-info-text">
           <p className="hero-tagline text-sans fade-in delay-1">{t('hero', 'tagline')}</p>
+          <div className="hero-info-image-mobile fade-in delay-2">
+            <img src="/hero-back.jpg" alt="Viktoria Tattoo" loading="lazy" />
+          </div>
           <p className="hero-subtitle text-serif fade-in delay-2">
             {t('hero', 'subtitle')}
           </p>
