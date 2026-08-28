@@ -107,6 +107,12 @@
   align-items: center;
 }
 
+@media (max-width: 767px) {
+  .hero-info-image {
+    order: -1;
+  }
+}
+
 .hero-info-image img {
   width: 100%;
   max-width: 500px;
