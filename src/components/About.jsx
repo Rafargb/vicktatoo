@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../LanguageContext';
+import { supabase } from '../supabase';
 import './About.css';
 
 const About = () => {
   const { t } = useLanguage();
+  const [aboutImage, setAboutImage] = useState('/IMG_6802.jpg');
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const { data } = await supabase.from('site_content').select('data').eq('id', 'hero_settings').single();
+        if (data && data.data && data.data.aboutImage) {
+          setAboutImage(data.data.aboutImage);
+        }
+      } catch (e) {
+        console.error('Error fetching about image:', e);
+      }
+    };
+    fetchImage();
+  }, []);
 
   return (
     <section className="section about-section">
@@ -12,7 +28,7 @@ const About = () => {
           <div className="about-image-wrapper fade-in">
             <div className="polaroid-frame">
               <div className="polaroid-image-container">
-                <img src="/IMG_6802.jpg" alt="Viktoria - Specialist" className="about-image" loading="lazy" />
+                <img src={aboutImage} alt="Viktoria - Specialist" className="about-image" loading="lazy" />
               </div>
               <div className="polaroid-text">
                 bodyjewel.tatt

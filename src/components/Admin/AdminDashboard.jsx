@@ -43,7 +43,7 @@ const AdminDashboard = ({ session, onLogout }) => {
   // New gallery state
   const [newGalleryName, setNewGalleryName] = useState('');
 
-  const [heroSettings, setHeroSettings] = useState({ logoText: '', desktopImage: '', mobileImage: '' });
+  const [heroSettings, setHeroSettings] = useState({ logoText: '', desktopImage: '', mobileImage: '', aboutImage: '' });
   const [loadingHeroUpload, setLoadingHeroUpload] = useState(false);
 
   useEffect(() => {
@@ -75,7 +75,8 @@ const AdminDashboard = ({ session, onLogout }) => {
       const defaultHero = {
         logoText: 'VIKTORIA • TATTOO PHUKET',
         desktopImage: '/hero-upscaled.jpg',
-        mobileImage: '/hero-upscaled.jpg'
+        mobileImage: '/hero-upscaled.jpg',
+        aboutImage: '/IMG_6802.jpg'
       };
       await supabase.from('site_content').upsert({ id: 'hero_settings', data: defaultHero });
       setHeroSettings(defaultHero);
@@ -362,6 +363,26 @@ const AdminDashboard = ({ session, onLogout }) => {
                   </div>
                 )}
                 <input type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, 'mobileImage')} disabled={loadingHeroUpload} />
+                {loadingHeroUpload && <span>Обработка...</span>}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
+              <h4>Фотография "Обо мне" (Полароид)</h4>
+              <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Рекомендуется: Вертикальное фото.</p>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                {heroSettings.aboutImage && (
+                  <div style={{ position: 'relative' }}>
+                    <img src={heroSettings.aboutImage} alt="About" style={{ width: '100px', height: '125px', objectFit: 'cover', borderRadius: '4px' }} />
+                    <button 
+                      onClick={() => handleDeleteHeroImage('aboutImage')}
+                      style={{ position: 'absolute', top: -10, right: -10, background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer' }}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
+                <input type="file" accept="image/*" onChange={(e) => handleHeroUpload(e, 'aboutImage')} disabled={loadingHeroUpload} />
                 {loadingHeroUpload && <span>Обработка...</span>}
               </div>
             </div>
