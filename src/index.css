@@ -20,6 +20,15 @@
   --spacing-xxl: 12rem;
 }
 
+@media (max-width: 768px) {
+  :root {
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2.5rem;
+    --spacing-xl: 3.5rem;
+    --spacing-xxl: 5rem;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
