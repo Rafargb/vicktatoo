@@ -11,14 +11,30 @@ const About = () => {
         <div className="about-grid">
           <div className="about-image-wrapper fade-in">
             <div className="polaroid-frame">
-              <div className="paperclip">
-                <svg viewBox="0 0 40 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M21 78.5C21 82.0899 18.0899 85 14.5 85C10.9101 85 8 82.0899 8 78.5V28.5C8 22.1487 13.1487 17 19.5 17C25.8513 17 31 22.1487 31 28.5V70.5C31 74.6421 27.6421 78 23.5 78C19.3579 78 16 74.6421 16 70.5V32.5" stroke="#D1D5DB" strokeWidth="3" strokeLinecap="round"/>
-                  <path d="M21 78.5C21 82.0899 18.0899 85 14.5 85C10.9101 85 8 82.0899 8 78.5V28.5C8 22.1487 13.1487 17 19.5 17C25.8513 17 31 22.1487 31 28.5V70.5C31 74.6421 27.6421 78 23.5 78C19.3579 78 16 74.6421 16 70.5V32.5" stroke="#9CA3AF" strokeWidth="1" strokeLinecap="round"/>
+              <div className="binder-clip">
+                <svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g filter="drop-shadow(0px 5px 4px rgba(0,0,0,0.3))">
+                    <path d="M42 20 L42 60" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M32 35 C32 15, 42 15, 42 20" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M32 35 L32 60" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
+
+                    <path d="M58 20 L58 60" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M68 35 C68 15, 58 15, 58 20" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M68 35 L68 60" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
+
+                    <rect x="20" y="60" width="60" height="16" rx="4" fill="none" stroke="#D1D5DB" strokeWidth="4"/>
+                    <line x1="20" y1="64" x2="80" y2="64" stroke="#D1D5DB" strokeWidth="4" />
+                    <line x1="20" y1="72" x2="80" y2="72" stroke="#D1D5DB" strokeWidth="4" />
+                    
+                    <rect x="20" y="60" width="60" height="16" rx="4" fill="none" stroke="#FFFFFF" strokeWidth="1" opacity="0.6"/>
+                  </g>
                 </svg>
               </div>
               <div className="polaroid-image-container">
                 <img src="/IMG_6802.jpg" alt="Viktoria - Specialist" className="about-image" loading="lazy" />
+              </div>
+              <div className="polaroid-text">
+                bodyjewel.tatt
               </div>
             </div>
           </div>
