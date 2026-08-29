@@ -34,19 +34,14 @@ const About = () => {
                   </defs>
 
                   <g filter="url(#clipShadow)">
-                    <!-- Wide outer wire looping DOWN to hold the paper -->
                     <path d="M 28 65 L 28 95 C 28 98 30 100 33 100 L 67 100 C 70 100 72 98 72 95 L 72 65" stroke="url(#wireGrad)" strokeWidth="4.5" strokeLinecap="round"/>
                     
-                    <!-- Inner wire loops going UP (the squeeze handles) -->
                     <path d="M 43 65 L 43 35 C 43 20 57 20 57 35 L 57 65" stroke="url(#wireGrad)" strokeWidth="4" />
                     
-                    <!-- The two distinct circles at the top of the handles -->
                     <circle cx="43" cy="25" r="11" stroke="url(#wireGrad)" strokeWidth="3.5" />
                     <circle cx="57" cy="25" r="11" stroke="url(#wireGrad)" strokeWidth="3.5" />
                     
-                    <!-- Central Metal Body Clamp -->
                     <rect x="23" y="65" width="54" height="14" rx="2" fill="url(#bodyGrad)" stroke="#777" strokeWidth="0.5" />
-                    <!-- Horizontal inner fold lines for realism -->
                     <line x1="25" y1="70" x2="75" y2="70" stroke="#666" strokeWidth="2" />
                     <line x1="25" y1="74" x2="75" y2="74" stroke="#666" strokeWidth="1.5" />
                   </g>
