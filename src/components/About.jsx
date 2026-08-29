@@ -26,14 +26,7 @@ const About = () => {
       <div className="container">
         <div className="about-grid">
           <div className="about-image-wrapper fade-in">
-            <div className="polaroid-frame">
-              <div className="polaroid-image-container">
-                <img src={aboutImage} alt="Viktoria - Specialist" className="about-image" loading="lazy" />
-              </div>
-              <div className="polaroid-text">
-                bodyjewel.tatt
-              </div>
-            </div>
+            <img src={aboutImage} alt="Viktoria - Specialist" className="about-image" loading="lazy" />
           </div>
           <div className="about-content fade-in delay-1">
             <h2 className="about-title" dangerouslySetInnerHTML={{ __html: t('about', 'title') }}></h2>

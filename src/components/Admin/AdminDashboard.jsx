@@ -368,7 +368,7 @@ const AdminDashboard = ({ session, onLogout }) => {
             </div>
 
             <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
-              <h4>Фотография "Обо мне" (Полароид)</h4>
+              <h4>Фотография "Обо мне"</h4>
               <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Рекомендуется: Вертикальное фото.</p>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 {heroSettings.aboutImage && (
