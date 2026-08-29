@@ -149,7 +149,7 @@
     width: 100%;
     max-width: 500px;
     height: auto;
-    border-radius: 4px;
+    border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   }
   .hero-tagline {
@@ -161,7 +161,7 @@
   width: 100%;
   max-width: 500px;
   height: auto;
-  border-radius: 4px;
+  border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
