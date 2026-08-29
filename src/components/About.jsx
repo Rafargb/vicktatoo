@@ -13,20 +13,42 @@ const About = () => {
             <div className="polaroid-frame">
               <div className="binder-clip">
                 <svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g filter="drop-shadow(0px 5px 4px rgba(0,0,0,0.3))">
-                    <path d="M42 20 L42 60" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
-                    <path d="M32 35 C32 15, 42 15, 42 20" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
-                    <path d="M32 35 L32 60" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
+                  <defs>
+                    <linearGradient id="wireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#E2E2E2" />
+                      <stop offset="40%" stopColor="#FFFFFF" />
+                      <stop offset="50%" stopColor="#999999" />
+                      <stop offset="60%" stopColor="#FFFFFF" />
+                      <stop offset="100%" stopColor="#A1A1A1" />
+                    </linearGradient>
+                    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#D5D5D5" />
+                      <stop offset="20%" stopColor="#FFFFFF" />
+                      <stop offset="50%" stopColor="#888888" />
+                      <stop offset="80%" stopColor="#EEEEEE" />
+                      <stop offset="100%" stopColor="#555555" />
+                    </linearGradient>
+                    <filter id="clipShadow">
+                      <feDropShadow dx="0" dy="6" stdDeviation="4" floodOpacity="0.4" />
+                    </filter>
+                  </defs>
 
-                    <path d="M58 20 L58 60" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
-                    <path d="M68 35 C68 15, 58 15, 58 20" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
-                    <path d="M68 35 L68 60" stroke="#D1D5DB" strokeWidth="4" strokeLinecap="round"/>
-
-                    <rect x="20" y="60" width="60" height="16" rx="4" fill="none" stroke="#D1D5DB" strokeWidth="4"/>
-                    <line x1="20" y1="64" x2="80" y2="64" stroke="#D1D5DB" strokeWidth="4" />
-                    <line x1="20" y1="72" x2="80" y2="72" stroke="#D1D5DB" strokeWidth="4" />
+                  <g filter="url(#clipShadow)">
+                    <!-- Wide outer wire looping DOWN to hold the paper -->
+                    <path d="M 28 65 L 28 95 C 28 98 30 100 33 100 L 67 100 C 70 100 72 98 72 95 L 72 65" stroke="url(#wireGrad)" strokeWidth="4.5" strokeLinecap="round"/>
                     
-                    <rect x="20" y="60" width="60" height="16" rx="4" fill="none" stroke="#FFFFFF" strokeWidth="1" opacity="0.6"/>
+                    <!-- Inner wire loops going UP (the squeeze handles) -->
+                    <path d="M 43 65 L 43 35 C 43 20 57 20 57 35 L 57 65" stroke="url(#wireGrad)" strokeWidth="4" />
+                    
+                    <!-- The two distinct circles at the top of the handles -->
+                    <circle cx="43" cy="25" r="11" stroke="url(#wireGrad)" strokeWidth="3.5" />
+                    <circle cx="57" cy="25" r="11" stroke="url(#wireGrad)" strokeWidth="3.5" />
+                    
+                    <!-- Central Metal Body Clamp -->
+                    <rect x="23" y="65" width="54" height="14" rx="2" fill="url(#bodyGrad)" stroke="#777" strokeWidth="0.5" />
+                    <!-- Horizontal inner fold lines for realism -->
+                    <line x1="25" y1="70" x2="75" y2="70" stroke="#666" strokeWidth="2" />
+                    <line x1="25" y1="74" x2="75" y2="74" stroke="#666" strokeWidth="1.5" />
                   </g>
                 </svg>
               </div>
