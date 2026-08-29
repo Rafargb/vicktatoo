@@ -79,21 +79,6 @@
   border-radius: 6px; /* slightly rounded photo inside */
 }
 
-.binder-clip {
-  position: absolute;
-  top: -45px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 80px;
-  z-index: 2;
-}
-
-.binder-clip svg {
-  width: 100%;
-  height: 100%;
-}
-
 .polaroid-text {
   position: absolute;
   bottom: 12px;
